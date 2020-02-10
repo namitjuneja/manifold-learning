@@ -1,7 +1,7 @@
 function playground_bfs()
 
     % read BFS traveral vectors generated from the python code
-    D = table2array(readtable('bfs_D_small_data.csv'));
+    D = table2array(readtable('../outputs/distance/small/bfs_D_3.csv'));
     %imagesc(D);
     
     %% Run Entropy Isomap with this data
@@ -22,14 +22,14 @@ function playground_bfs()
 %     plot_graph(Y, E);
 
       % Replicating figure 9 of the entropy isomap paper
-%     plot_graph(Y, E, [0 1 2 3])
-%     plot_graph(Y, E, [4 5 6 7])
-%     plot_graph(Y, E, [8 9 10 11])
-%     plot_graph(Y, E, [12 13 14 15])
-%     plot_graph(Y, E, [0 4 8 12])
-%     plot_graph(Y, E, [1 5 9 13])
-%     plot_graph(Y, E, [2 6 10 14])
-%     plot_graph(Y, E, [3 7 11 15])
+    plot_graph(Y, E, [0 1 2 3])
+    plot_graph(Y, E, [4 5 6 7])
+    plot_graph(Y, E, [8 9 10 11])
+    plot_graph(Y, E, [12 13 14 15])
+    plot_graph(Y, E, [0 4 8 12])
+    plot_graph(Y, E, [1 5 9 13])
+    plot_graph(Y, E, [2 6 10 14])
+    plot_graph(Y, E, [3 7 11 15])
     
 end
 
