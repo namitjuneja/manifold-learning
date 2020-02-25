@@ -1,3 +1,6 @@
 code_backup/
 data/
 .ipynb_checkpoints/
+data_backup/
+data_non_periodic/
+*.sw*
