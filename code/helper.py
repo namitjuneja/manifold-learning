@@ -83,7 +83,8 @@ def priority_bfs(graph, root):
             if neighbor[0] not in visited:
                 visited.append(neighbor[0])
                 queue.append(neighbor)
-    #set_trace()           
+    
+    vector = np.array(vector)          
     return vector      
 
 
@@ -100,22 +101,6 @@ def generate_vectors(graphs):
         vectors.append(vector)
     
     return vectors
-
-
-# generate padded vectors
-def generate_padded_vectors(vectors, max_dimension=None):
-    # get the dimension of the most dimensional vector
-    max_dimension = max_dimension or max((map(len, vectors))) 
-    print(f"> Padding to max dimension - {max_dimension}")
-    
-    # pad with zeros in the end
-    padded_vectors = []
-    for i in range(len(vectors)):
-        padded_vectors.append(vectors[i] + [0]*(max_dimension-len(vectors[i])))
-
-    padded_vectors = np.array(padded_vectors)
-
-    return padded_vectors
 
 
 # plot distance matrix
@@ -139,9 +124,85 @@ def plot_distance_graph(D, compare_with, start_slice):
 	plt.grid(True, which="minor", linestyle=':')
 	plt.grid(True, which="major", linestyle='-')
 
-	plt.plot(range(start_slice,D.shape[0]+start_slice),D[compare_with-start_slice, :], color="blue", label="Root node of any color")
+	plt.plot(range(start_slice,D.shape[0]+start_slice),D[compare_with-start_slice, :], label="Root node of any color")
 
 	plt.title(f"Comparing #{compare_with} point with the rest of the points")
 	plt.xlabel("Points in trajectory")
 	plt.ylabel("Points in trajectory")
 	plt.legend()
+
+
+
+
+## PADDING FUNCTIONS
+
+# front pad vector
+def front_pad(vector, max_dimension):
+    # make no array if not
+    if not isinstance(vector, np.ndarray): vector=np.array(vector)
+
+    return np.pad(vector, (0,max_dimension-len(vector)))
+
+
+# # generate padded vectors
+def generate_padded_vectors(vectors):
+    split_vectors = []
+
+    for vector in vectors:
+        # split the nodes based on sign
+        split_indices = []
+
+        for index,d in enumerate(vector):
+            if d >= 0:
+                split_indices.extend([index, index+1])
+
+        split_vector = np.split(vector, split_indices)
+        split_vectors.append(split_vector)
+
+
+
+    # get the maximum length of split at each 
+    # position for all the vectors
+    max_split_length = {}
+
+    for split_vector in split_vectors:
+        for index, split in enumerate(split_vector):
+            max_split_length[index] = max([len(split), max_split_length.get(index, 0)])
+
+
+
+    # pad all the splits to their 
+    # respective max lengths
+    padded_split_vectors = []
+    for split_vector in split_vectors:
+
+        padded_split_vector = []
+        for index,split in enumerate(split_vector):
+
+            padded_split = front_pad(split, max_split_length[index])
+            padded_split_vector.append(padded_split)
+
+        padded_split_vectors.append(padded_split_vector)
+
+
+
+    # Merge all splits into single vector
+    merged_vectors = []
+    for padded_split_vector in padded_split_vectors:
+        merged_vector = np.concatenate(padded_split_vector)
+        merged_vectors.append(merged_vector)
+
+
+    # over all frontpad to compensate for
+    # different number of layers in each graph
+    max_dimension = max(map(len, merged_vectors))
+
+    padded_vectors = []
+    for merged_vector in merged_vectors:
+
+        padded_vector = front_pad(merged_vector, max_dimension)
+        padded_vectors.append(padded_vector)
+
+
+    # write some tests maybe
+    return padded_vectors
