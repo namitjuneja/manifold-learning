@@ -206,14 +206,14 @@ def generate_padded_vectors(vectors):
 
 	# make all vector dimension magnitudes 
 	# positive irrespective of color
-	positive_vectors = []
-	for padded_vector in padded_vectors:
+	# positive_vectors = []
+	# for padded_vector in padded_vectors:
 
-		positive_vector = np.abs(padded_vector)
-		positive_vectors.append(positive_vector)
+	# 	positive_vector = np.abs(padded_vector)
+	# 	positive_vectors.append(positive_vector)
 
 	# write some tests maybe
-	return positive_vectors
+	return padded_vectors
 
 
 
@@ -222,13 +222,13 @@ def generate_distance_matrix(vectors):
 	vector_count = len(vectors)
 
 	D = np.empty((vector_count, vector_count))
-	for i in range(2):
-		for j in range(2):
+	for i in range(vector_count):
+		for j in range(vector_count):
+
 			vector_pair = [vectors[i],vectors[j]]
-			vector_pair_2 = vector_pair[::-1]
 			padded_vectors = generate_padded_vectors(vector_pair)
-			padded_vectors_2 = generate_padded_vectors(vector_pair_2)
-			if (padded_vectors[0] != padded_vectors_2[0]).any() or (padded_vectors[1] != padded_vectors_2[1]).any():
-				print(i,j,(padded_vectors[0] != padded_vectors_2[0]))
-				return(padded_vectors[0], padded_vectors_2[0])
-				print("Not working")
+
+			D[i][j] = pairwise_distances(padded_vectors, metric='manhattan')[0][1]
+
+	return D
+
