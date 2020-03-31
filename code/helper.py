@@ -14,7 +14,7 @@ def get_graph_from_file(phi, chi, replica, source_dir=None):
 		graphs = pickle.load(open(source_dir, 'rb'))[:80]
 	else:
 		trajectory_filename = f"BR{phi}-CHI{chi}-R{replica}.file"
-		source_dir = Path("/home/namit/codes/Entropy-Isomap/outputs/graphs/")/trajectory_filename
+		source_dir = Path("/home/namit/codes/Entropy-Isomap/outputs/square/graphs/")/trajectory_filename
 		graphs = pickle.load(open(source_dir, 'rb'))[:80]
 
 	print(f"> {len(graphs)} points loaded from file {trajectory_filename}.")
@@ -85,22 +85,24 @@ def priority_bfs(graph, root):
 				queue.append(neighbor)
 	
 	vector = np.array(vector)          
-	return vector      
+	return vector, visited      
 
 
 # generate vectors
 def generate_vectors(graphs):
 	vectors = []
+	visiting_orders = []
 
 	for graph in graphs:
 		# set the node with the highest edges as root
 		root = get_max_degree_node_color(graph)
 	
 		# get BFS vector
-		vector = priority_bfs(graph, root)
+		vector, visiting_order = priority_bfs(graph, root)
 		vectors.append(vector)
+		visiting_orders.append(visiting_order)
 	
-	return vectors
+	return vectors, visiting_orders
 
 
 # plot distance matrix
@@ -124,12 +126,15 @@ def plot_distance_graph(D, compare_with, start_slice):
 	plt.grid(True, which="minor", linestyle=':')
 	plt.grid(True, which="major", linestyle='-')
 
-	plt.plot(range(start_slice,D.shape[0]+start_slice),D[compare_with-start_slice, :], label="Root node of any color")
+	# xticklabels = list(range(start_slice, 80))*(D.shape[0]//(80-start_slice))
+	# ax.set_xticklabels(xticklabels)
 
+	plt.plot(range(start_slice,D.shape[0]+start_slice),D[compare_with-start_slice, :], label="Root node of any color")
 	plt.title(f"Comparing #{compare_with} point with the rest of the points")
 	plt.xlabel("Points in trajectory")
-	plt.ylabel("Points in trajectory")
+	plt.ylabel("Manhattan/L1 Distance")
 	plt.legend()
+	plt.tight_layout()
 
 
 
@@ -137,7 +142,7 @@ def plot_distance_graph(D, compare_with, start_slice):
 ## PADDING FUNCTIONS
 
 # front pad vector
-def front_pad(vector, max_dimension):
+def front_pad(vector, max_dimension): 
 	# make no array if not
 	if not isinstance(vector, np.ndarray): vector=np.array(vector)
 
@@ -216,7 +221,6 @@ def generate_padded_vectors(vectors):
 	return padded_vectors
 
 
-
 # generate distance matrix
 def generate_distance_matrix(vectors):
 	vector_count = len(vectors)
@@ -231,4 +235,3 @@ def generate_distance_matrix(vectors):
 			D[i][j] = pairwise_distances(padded_vectors, metric='manhattan')[0][1]
 
 	return D
-
