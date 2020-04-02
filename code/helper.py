@@ -232,6 +232,10 @@ def generate_distance_matrix(vectors):
 			vector_pair = [vectors[i],vectors[j]]
 			padded_vectors = generate_padded_vectors(vector_pair)
 
-			D[i][j] = pairwise_distances(padded_vectors, metric='manhattan')[0][1]
+			# experiment : remoe the first biggest node from the distance 
+			# since it is adding the most distance
+			# padded_vectors = [padded_vectors[0][1:], padded_vectors[1][1:]]
+
+			D[i][j] = pairwise_distances(padded_vectors, metric='euclidean')[0][1]
 
 	return D

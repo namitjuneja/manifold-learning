@@ -4,3 +4,5 @@ data/
 data_backup/
 data_non_periodic/
 *.sw*
+code/__pycache__
+selected_data/
